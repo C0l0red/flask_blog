@@ -112,7 +112,6 @@ def comment():
     else:
         return { "error": form.errors }
 
-@
 
 @post.route("/comment/<id>/delete")
 @login_required
