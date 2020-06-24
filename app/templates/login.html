@@ -12,13 +12,13 @@
 {% block nav %} {% endblock nav %}
 
 {% block body %}
-    <main class="container d-flex h-100 justify-content-center">
+    <main class="container-md d-flex h-100 justify-content-center">
         <div class="row align-self-center w-100">
 
             <div class="col-12">
                 <p>Red</p>
 
-                <form action="{{ url_for('auth.login') }}" method="POST" class="col-6 offset-3">
+                <form action="{{ url_for('auth.login') }}" method="POST" class="col-xs-12 col-md-6 offset-md-3">
                     <fieldset>
                       <legend class="bg-secondary pt-4 pb-4 w-100">Red</legend>
 
