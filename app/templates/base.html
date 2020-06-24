@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    {#<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">#}
+    {% block head%}
+    {% endblock head%}
+  </head>
+  <body>
+    {% block nav %}
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Expand at md</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarsExample04">
+        <ul class="navbar-nav mr-auto">
+          {% if current_user.is_authenticated %}
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('post.home', id= current_user.id) }}">Home <span class="sr-only">(current)</span></a>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('post.posts') }}">Posts</a>
+          </li>
+          {% if current_user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Profile</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown04">
+              <a class="dropdown-item" href="{{ url_for('auth.edit_profile') }}">Edit Profile</a>
+              <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Sign out</a>
+            </div>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.login') }}" tabindex="-1">Sign in</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.register') }}" tabindex="-1">Sign up</a>
+          </li>
+          {% endif %}
+        </ul>
+        <form class="form-inline my-2 my-md-0">
+          <input class="form-control" type="text" placeholder="Search">
+        </form>
+      </div>
+    </nav>
+    {% endblock nav %}
+    
+    {% block body %} {% endblock %}
+    
+    {% block scripts %}{% endblock scripts %}
+  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js' ) }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <script lang="JavaScript">
+const comment = (className) => {
+    $(className).on("submit", function(e){
+      e.preventDefault();
+      const commentPost = $(this).closest(".post")[0];
+      console.log($(commentPost).attr("id"));
+      $.post(
+          "/comment",
+          {
+              "id" : $(commentPost).attr("id"),
+              "comment": $(commentPost).find("[name='comment']").val(),
+              "csrf_token": $(commentPost).find("[name='csrf_token']").val()
+          }
+      ).done(function(response){
+          if ("error" in response){
+            $.each(response.error.comment, function(index, value){
+              let msg = `
+            <div class='d-block invalid-feedback'>
+              <small>${value}</small>
+            </div>
+            `;
+            $(commentPost).find("[name='comment']").after(msg)
+            })
+            return;
+          }
+          let newComment = `
+          <div class="d-flex flex-row comment-row m-t-0 comment mb-2" id="comment-${ response.public_id }">
+              <div class="p-2"><img src="{{ url_for('static', filename='images/4.jpg') }}" alt="user" width="50" class="rounded-circle comment-user-image"></div>
+              <div class="comment-text w-100">
+                  <h6 class="font-medium comment-user">${ response.user.username }</h6> 
+                  <span class="m-b-15 d-block comment-body"> ${ response.comment } </span>
+                  <div class="comment-footer"> <span class="text-muted float-right comment-time"> ${ response.ago } </span>
+                      <button type="button" class="btn btn-primary btn-sm" id='edit-${response.public_id}'>Edit</button>
+                      <button type="button" class="btn btn-danger btn-sm delete-button" id='delete-${response.public_id}'>Delete</button> 
+                  </div>
+              </div>
+          </div> 
+          `;
+          $(commentPost).find("[name='comment']").val("")
+          if ($(commentPost).find(".comments").children().length == 3)
+            $(commentPost).find(".comments").children().first().remove();
+          $(commentPost).find(".comments").append(newComment);
+          //$(comments).append(newComment);
+          }).fail(function(){
+              console.log("Server Error");
+          });
+    });
+
+}
+const post = (e) => {
+    e.preventDefault();
+    $.post("/user/{{current_user.id}}",
+    {csrf_token: $("#csrf_token").val(),
+    title: $("#title").val(),
+    content: $("#content").val()
+    }).done(function(response){
+        let new_post = `<div class="post">
+                            <h2>${response.title}</h2>
+                            <small>${response.ago}</small>
+                            <p>${response.content}</p>
+                            <a href="/posts/delete/${response.id}">Delete</a>
+                            <a href="/posts/edit/${response.id}">Edit</a>
+                            <hr>
+                        </div>`;
+        let last = $(".post:first");
+        $(last).before(new_post);
+        $(".reset").val("");
+    }).fail(function(){alert("Server Error")});    
+}
+$(function(){
+  
+  comment(".commentform")
+})
+  </script>
+
+  </body>
+</html>

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Login</title>
+<style>
+    body,html{
+        height: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block nav %} {% endblock nav %}
+
+{% block body %}
+    <main class="container d-flex h-100 justify-content-center">
+        <div class="row align-self-center w-100">
+
+            <div class="col-12">
+                <p>Red</p>
+
+                <form action="{{ url_for('auth.login') }}" method="POST" class="col-6 offset-3">
+                    <fieldset>
+                      <legend class="bg-secondary pt-4 pb-4 w-100">Red</legend>
+
+                      {{ form.csrf_token }}
+
+                    <div class="form-group">
+                      <label for="username">Username</label>
+                      <input type="text" class="form-control" id="username" name="username" aria-describedby="usernameHelp" required autofocus>
+                      {% for error in form.username.errors %}
+                        <div class="invalid-feedback d-block">
+                            <span>{{ error }}</span>
+                        </div>
+                      {% endfor %}
+                      <small id="usernameHelp" class="form-text text-muted col-12">Please sign in with your username or email.</small>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="password">Password</label>
+                      {{ form.password(class="form-control")}}
+                      {% for error in form.password.errors %}
+                        <div class="invalid-feedback d-block">
+                            <span class="text-danger">{{ error }}</span>
+                        </div>
+                      {% endfor %}
+                    </div>
+
+                    <div class="form-group form-check">
+                      <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                      <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                    </div>
+
+                    <input type="submit" class="btn btn-secondary btn-block" value="Sign in">
+                    <small class="text-muted"><a href="{{ url_for('auth.forgot_password') }}">Forgot Password?</a></small>
+                    </fieldset>
+
+                </form>
+            </div>
+        </div>
+    </main>
+{% endblock body %}

@@ -1,0 +1,84 @@
+{% macro render_post(post, index= False) %}
+    <div class="post" id="{{ post.public_id }}">
+        <div class="post-header w-100 text-center">
+            <h2 class="post-title">{{ post.title }}</h2>
+            {% if not index %}
+                <p>
+                    <small class="text-muted">
+                        <span class="date-posted">{{ post.date_posted|ago }} by</span>
+                        {% if current_user == post.author %}
+                        <a class="post-author" href="{{ url_for('post.home', id=post.author.id  ) }}">You</a>
+                        {% else %}
+                        <a class="post-author" href="{{ url_for('post.home', id=post.author.id  ) }}">{{ post.author }}</a>
+                        {% endif %}
+                    </small>
+                </p>
+            {% else %}
+                <p><small class="text-muted"><span class="date-posted">{{ post.date_posted|ago }}</span></small></p>
+            {% endif %}
+        </div>
+       {% set liked, disliked = post.in_(current_user) %}
+       {% set like_class = "btn-success" if liked else "btn-secondary"%}
+       {% set dislike_class = "btn-danger" if disliked else "btn-secondary" %}
+        <p class="post-content">{{ post.content }}</p>
+        <div class="d-flex justify-content-end">
+            <div class="btn-group reactions mb-3" id='reactions-{{ post.public_id }}'>
+                <a type="button" class="btn btn-sm {{ like_class }} text-light Like" id="likes-{{ post.public_id }}">{{ post.likes.all()|length }} Like{{ post.likes.count()|pluralize }}</a>
+                <a type="button" class="btn btn-sm {{ dislike_class }} text-light Dislike" id="dislikes-{{ post.public_id }}">{{ post.dislikes.all()|length }} Dislike{{ post.dislikes.count()|pluralize }}</a>
+            </div>
+        </div>
+        
+
+        <div class="row mt-100 mb-100 mb-3">
+            <div class="col-md-12">
+                <div class="card comment-section p-2">
+                    <div class="card-body text-center">
+                        {% if post.comments.count() > 3 %}
+                        <h4 class="card-title comment-head">Latest Comment{{ post.comments.count()|pluralize  }}</h4>
+                        {% elif post.comments.all() %}
+                        <h4 class="card-title comment-head">{{ post.comments.count() }} Comment{{ post.comments.count()|pluralize  }}</h4>
+                        {% else %}
+                        <h4 class="card-title comment-head">No Comment{{ post.comments.count()|pluralize  }}</h4>
+                        {% endif %}
+                    </div>
+                    <div class="comment-widgets comments">
+                        {% for comment in post.comments.order_by(Comment.time_created.desc()).limit(3).all()[::-1] %}
+                        <!-- Comment Row -->
+                        <div class="d-flex flex-row comment-row m-t-0 comment mb-2" id="comment-{{ comment.public_id }}">
+                            <div class="p-2"><img src="{{ url_for('static', filename='images/4.jpg') }}" alt="user" width="50" class="rounded-circle comment-user-image"></div>
+                            <div class="comment-text w-100">
+                                <h6 class="font-medium comment-user">{{ comment.user }}</h6> <span class="m-b-15 d-block comment-body"> {{ comment.comment }} </span>
+                                <div class="comment-footer"> <span class="text-muted float-right comment-time"> {{ comment.time_created|ago }} </span>
+                                    {% if current_user == comment.user %}
+                                    <button type="button" class="btn btn-primary btn-sm" id="edit-{{ comment.public_id }}">Edit</button>
+                                    <button type="button" class="btn btn-danger btn-sm" id='delete-{{ comment.public_id }}'>Delete</button> 
+                                    {% elif current_user == post.author %}
+                                    <button type="button" class="btn btn-danger btn-sm" id="delete-{{ comment.public_id }}">Delete</button> 
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div> <!-- Comment Row -->
+                        {% endfor %}
+                    </div> <!-- Card -->
+                </div>
+            </div>
+        </div>
+        
+        <form action="{{ url_for('post.comment') }}" method="post" class="commentform">
+            {% set comment = comment_form() %}
+            {% set disabled = "disabled" if not current_user.is_authenticated else "" %}
+            {{ comment.csrf_token(class="csrf") }}
+            <div class="form-group">
+                <textarea name="comment" {{ disabled }} class="form-control" required></textarea>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Comment" class="btn btn-info {{ disabled }}">
+            </div>
+        </form>
+        {% if current_user == post.author %}
+            <a href='{{ url_for("post.delete", id=post.id) }}'>Delete</a> 
+            <a href='{{ url_for("post.edit", id=post.id) }}'>Edit</a>
+        {% endif %}
+    </div>
+{% endmacro %}

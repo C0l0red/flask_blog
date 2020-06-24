@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% from 'helpers.html' import render_post with context %}
+
+{% block head %}
+<title>Posts</title> 
+{% endblock %}
+
+{% block body %}
+<main class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>All Posts</h1>
+
+            {% for post in posts %}
+                {{ render_post(post) }}
+            {% else %}
+                No posts yet
+            {% endfor%}
+        </div>
+    </div>
+</main>
+Current user : {{ current_user }}
+
+{% endblock %}
