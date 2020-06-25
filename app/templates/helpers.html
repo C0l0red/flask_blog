@@ -18,13 +18,13 @@
             {% endif %}
         </div>
        {% set liked, disliked = post.in_(current_user) %}
-       {% set like_class = "btn-success" if liked else "btn-secondary"%}
+       {% set like_class = "btn-primary" if liked else "btn-secondary"%}
        {% set dislike_class = "btn-danger" if disliked else "btn-secondary" %}
         <p class="post-content">{{ post.content }}</p>
         <div class="d-flex justify-content-end">
             <div class="btn-group reactions mb-3" id='reactions-{{ post.public_id }}'>
-                <a type="button" class="btn btn-sm {{ like_class }} text-light Like" id="likes-{{ post.public_id }}">{{ post.likes.all()|length }} Like{{ post.likes.count()|pluralize }}</a>
-                <a type="button" class="btn btn-sm {{ dislike_class }} text-light Dislike" id="dislikes-{{ post.public_id }}">{{ post.dislikes.all()|length }} Dislike{{ post.dislikes.count()|pluralize }}</a>
+                <button type="button" class="btn btn-sm {{ like_class }} text-light Like" id="likes-{{ post.public_id }}">{{ post.likes.all()|length }} Like{{ post.likes.count()|pluralize }}</button>
+                <button type="button" class="btn btn-sm {{ dislike_class }} text-light Dislike" id="dislikes-{{ post.public_id }}">{{ post.dislikes.all()|length }} Dislike{{ post.dislikes.count()|pluralize }}</button>
             </div>
         </div>
         
@@ -44,16 +44,16 @@
                     <div class="comment-widgets comments">
                         {% for comment in post.comments.order_by(Comment.time_created.desc()).limit(3).all()[::-1] %}
                         <!-- Comment Row -->
-                        <div class="d-flex flex-row comment-row m-t-0 comment mb-2" id="comment-{{ comment.public_id }}">
+                        <div class="d-flex flex-row comment-row m-t-0 comment mb-2" id="{{ comment.public_id }}">
                             <div class="p-2"><img src="{{ url_for('static', filename='images/4.jpg') }}" alt="user" width="50" class="rounded-circle comment-user-image"></div>
-                            <div class="comment-text w-100">
+                            <div class="comment-text w-100 pt-1 pb-1">
                                 <h6 class="font-medium comment-user">{{ comment.user }}</h6> <span class="m-b-15 d-block comment-body"> {{ comment.comment }} </span>
                                 <div class="comment-footer"> <span class="text-muted float-right comment-time"> {{ comment.time_created|ago }} </span>
                                     {% if current_user == comment.user %}
-                                    <button type="button" class="btn btn-primary btn-sm" id="edit-{{ comment.public_id }}">Edit</button>
-                                    <button type="button" class="btn btn-danger btn-sm" id='delete-{{ comment.public_id }}'>Delete</button> 
+                                    <button type="button" class="btn btn-primary btn-sm edit-comment" onclick="edit()">Edit</button>
+                                    <button type="button" class="btn btn-danger btn-sm delete-comment" onclick="del()">Delete</button> 
                                     {% elif current_user == post.author %}
-                                    <button type="button" class="btn btn-danger btn-sm" id="delete-{{ comment.public_id }}">Delete</button> 
+                                    <button type="button" class="btn btn-danger btn-sm delete-comment" onclick="del()">Delete</button> 
                                     {% endif %}
 
                                 </div>
@@ -77,8 +77,10 @@
             </div>
         </form>
         {% if current_user == post.author %}
-            <a href='{{ url_for("post.delete", id=post.id) }}'>Delete</a> 
-            <a href='{{ url_for("post.edit", id=post.id) }}'>Edit</a>
+            <div class="d-block">
+                <button class="edit-post btn btn-sm btn-warning text-light" type="button" >Edit</button>
+                <button class="delete-post btn btn-sm btn-danger text-light" type="button">Delete</button>
+            </div>
         {% endif %}
     </div>
 {% endmacro %}
