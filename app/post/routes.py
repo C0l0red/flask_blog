@@ -54,15 +54,6 @@ def single_post(public_id):
 
     return render_template("post.html", post=post)
 
-@post.route('/posts/delete/<int:id>', methods=["POST"])
-@login_required
-def delete(id):
-    post = BlogPost.query.get_or_404(id)
-    if post.author != current_user:
-        abort(403)
-    db.session.delete(post)
-    db.session.commit()
-    return {"message":"deleted"}
 
 @post.route('/posts/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -113,16 +104,23 @@ def comment():
         return { "error": form.errors }
 
 
-@post.route("/comment/<id>/delete")
+@post.route("/delete/<type_>/<public_id>", methods=['POST'])
 @login_required
-def delete_comment(id):
-    comment = Comment.query.filter_by(public_id=id).first_or_404()
-    if comment.user != current_user:
-        abort(403)
+def delete(type_, public_id):
+    if type_ == "comment":
+        comment = Comment.query.filter_by(public_id=public_id).first_or_404()
+        if comment.user != current_user:
+            abort(403)
+        entry = comment
+    elif type_ == "post":
+        post = BlogPost.query.filter_by(public_id=public_id).first_or_404()
+        if post.author != current_user:
+            abort(403)
+        entry = post
 
-    db.session.delete(comment)
+    db.session.delete(entry)
     db.session.commit()
-    return {"message": "deleted"}
+    return {"status": "success"}
 
 @post.route("/react", methods=["POST"])
 def react():

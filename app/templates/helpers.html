@@ -50,7 +50,7 @@
                                 <h6 class="font-medium comment-user">{{ comment.user }}</h6> <span class="m-b-15 d-block comment-body"> {{ comment.comment }} </span>
                                 <div class="comment-footer"> <span class="text-muted float-right comment-time"> {{ comment.time_created|ago }} </span>
                                     {% if current_user == comment.user %}
-                                    <button type="button" class="btn btn-primary btn-sm edit-comment" onclick="edit()">Edit</button>
+                                    <button type="button" class="btn btn-info btn-sm edit-comment" onclick="edit()">Edit</button>
                                     <button type="button" class="btn btn-danger btn-sm delete-comment" onclick="del()">Delete</button> 
                                     {% elif current_user == post.author %}
                                     <button type="button" class="btn btn-danger btn-sm delete-comment" onclick="del()">Delete</button> 
@@ -78,8 +78,8 @@
         </form>
         {% if current_user == post.author %}
             <div class="d-block">
-                <button class="edit-post btn btn-sm btn-warning text-light" type="button" >Edit</button>
-                <button class="delete-post btn btn-sm btn-danger text-light" type="button">Delete</button>
+                <button class="edit-post btn btn-sm btn-warning text-light" type="button" onclick="edit()">Edit</button>
+                <button class="delete-post btn btn-sm btn-danger text-light" type="button" onclick="del()">Delete</button>
             </div>
         {% endif %}
     </div>

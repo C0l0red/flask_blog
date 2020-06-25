@@ -76,18 +76,32 @@ function react(reaction){
     });
 } 
 
-/*
-const del = (e)=> {
-    e.preventDefault();
-    //console.log($(e.currentTarget).parent());
-    $.post($(e.currentTarget).attr("href"),{}
-    ).done(function(response){
-        if (response.message == "deleted"){
-            $($(e.currentTarget).parent()).remove();
-        }
+const del = () => {
+    let trigger = $(window.event.target);
+    let postId = $(window.event.target).closest('.post').attr('id');
+  
+    if ($(trigger).hasClass('delete-comment')){
+      var target = $(trigger).closest(".comment");
+      var type = "comment";
+    }else if ($(trigger).hasClass('delete-post')){
+      var target = $(trigger).closest('.post');
+      var type = 'post';
+    }
+    
+    $("#exampleModal").modal('show');
+    $("#confirmDelete").on("click", function(e){
+      $("#exampleModal").modal("hide");
+      
+      $.post(`/delete/${type}/${$(target).attr("id")}`
+      ).done(function(response){
+        if (response.status == "success")
+          $(target).remove();
+        
+      }).fail(function(){console.log("Server error"); });
     });
-}
-*/
+  }
+
+  
 $(function(){
     console.log();
     react("Like");
