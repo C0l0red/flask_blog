@@ -99,9 +99,9 @@ const del = () => {
         
       }).fail(function(){console.log("Server error"); });
     });
-  }
+  };
 
-  
+
 $(function(){
     console.log();
     react("Like");
