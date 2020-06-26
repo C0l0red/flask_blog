@@ -29,7 +29,7 @@ def populate():
     pink.set_password("password")
     post1 = BlogPost(title="post 1", content="content 1 and stuff", author=red)
     post2 = BlogPost(title="post 2", content="content 2", author=pink)
-    post3 = BlogPost(title="post 3", content="content 3 is wack", author=polly)
+    post3 = BlogPost(title="post 3", content="content 3 .........", author=polly)
     db.session.add(red)
     db.session.add(polly)
     db.session.add(pink)
