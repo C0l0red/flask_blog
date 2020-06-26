@@ -47,7 +47,7 @@
                         <div class="d-flex flex-row comment-row m-t-0 comment mb-2" id="{{ comment.public_id }}">
                             <div class="p-2"><img src="{{ url_for('static', filename='images/4.jpg') }}" alt="user" width="50" class="rounded-circle comment-user-image"></div>
                             <div class="comment-text w-100 pt-1 pb-1">
-                                <h6 class="font-medium comment-user">{{ comment.user }}</h6> 
+                                <h6 class="font-medium comment-user font-weight-bold">{{ comment.user }}</h6> 
                                 <span class="m-b-15 d-block comment-body"> {{ comment.comment }} </span>
                                 <div class="comment-footer"> <span class="text-muted float-right comment-time"> {{ comment.time_created|ago }} </span>
                                     {% if current_user == comment.user %}

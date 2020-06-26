@@ -24,14 +24,14 @@ const comment = (className) => {
             return;
           }
           let newComment = `
-          <div class="d-flex flex-row comment-row m-t-0 comment mb-2" id="comment-${ response.public_id }">
-              <div class="p-2"><img src="{{ url_for('static', filename='images/4.jpg') }}" alt="user" width="50" class="rounded-circle comment-user-image"></div>
+          <div class="d-flex flex-row comment-row m-t-0 comment mb-2" id="${ response.public_id }">
+              <div class="p-2"><img src="/static/images/4.jpg" alt="user" width="50" class="rounded-circle comment-user-image"></div>
               <div class="comment-text w-100">
-                  <h6 class="font-medium comment-user">${ response.user.username }</h6> 
+                  <h6 class="font-medium comment-user font-weight-bold">${ response.user.username }</h6> 
                   <span class="m-b-15 d-block comment-body"> ${ response.comment } </span>
                   <div class="comment-footer"> <span class="text-muted float-right comment-time"> ${ response.ago } </span>
-                      <button type="button" class="btn btn-primary btn-sm" id='edit-${response.public_id}'>Edit</button>
-                      <button type="button" class="btn btn-danger btn-sm delete-button" id='delete-${response.public_id}'>Delete</button> 
+                      <button type="button" class="btn btn-info btn-sm edit-comment" onclick='editComment()'>Edit</button>
+                      <button type="button" class="btn btn-danger btn-sm delete-comment" onclick='del()'>Delete</button> 
                   </div>
               </div>
           </div> 

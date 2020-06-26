@@ -85,7 +85,7 @@ def comment():
         if comment.user != current_user:
             abort(403)
         comment.comment = request.form["comment"]
-        #comment.edited = True
+        comment.edited = True
         db.session.commit()
         return {"status":"success"}
     post = BlogPost.query.filter_by(public_id=request.form["id"]).first_or_404()

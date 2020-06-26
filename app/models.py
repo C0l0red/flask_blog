@@ -75,6 +75,7 @@ class BlogPost(db.Model, ModelMixin):
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    edited = db.Column(db.Boolean, default=False)
 
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     author = db.relationship("User", backref='posts', lazy=True)
@@ -139,6 +140,7 @@ class Comment(db.Model, ModelMixin):
     parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
     parent = db.relationship('Comment', backref="sub_comments", remote_side=id)
     time_created = db.Column(db.DateTime, default=datetime.utcnow)
+    edited = db.Column(db.Boolean, default=False)
 
     comment = db.Column(db.Text, nullable=False)
     user = db.relationship("User", backref="comments", lazy=True)
