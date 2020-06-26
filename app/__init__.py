@@ -4,6 +4,7 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from jinja2_pluralize import pluralize_dj
 from flask_marshmallow import Marshmallow
+import os
 
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -12,7 +13,7 @@ login_manager.login_view = 'auth.login'
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.sqlite3'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
     app.config["SECRET_KEY"] = 'dev'
 
     db.init_app(app)

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, InputRequired, EqualTo, Email, ValidationError
 from app.models import User
 
@@ -9,7 +9,7 @@ class RegistrationForm(FlaskForm):
     email = StringField("Email", validators=[Email()])
     password = PasswordField("Password", validators=[Length(min=8), InputRequired()])
     password_confirm = PasswordField("Confirm Password", validators=[Length(min=8), EqualTo("password", message="Passwords must match")])
-
+    sign_in = BooleanField("Sign me in afterwards")
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user:
@@ -24,6 +24,7 @@ class RegistrationForm(FlaskForm):
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[InputRequired()])
+    remember_me = BooleanField("Remember Me")
 
     def validate(self, *args, **kwargs):
         valid = super(LoginForm, self).validate(*args, **kwargs)

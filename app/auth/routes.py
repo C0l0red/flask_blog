@@ -16,7 +16,10 @@ def register():
         new_user.set_password(form.password.data)
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for('post.posts'))
+        if form.sign_in.data:
+            login_user(new_user)
+            return redirect(url_for('post.posts'))
+        return redirect(url_for('auth.login'))
     return render_template("register.html", form=form, title="Sign Up", last_updated=dir_last_updated('app/static'))
 
 @auth.route("/login", methods= ['GET', "POST"])
@@ -33,7 +36,7 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.check_password(form.password.data):
-            login_user(user)
+            login_user(user, remember=form.remember_me.data)
             new_login = Login(ip_address=ip, device=device, user=user)
             db.session.add(new_login)
             db.session.commit()
