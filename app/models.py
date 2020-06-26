@@ -120,7 +120,7 @@ class BlogPostSchema(ma.Schema):
 class Login(db.Model, ModelMixin):
     id = db.Column(db.Integer, primary_key=True)
     ip_address = db.Column(db.String(20))
-    device = db.Column(db.String(100))
+    device = db.Column(db.Text)
     time = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
