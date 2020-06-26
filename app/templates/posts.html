@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'helpers.html' import render_post with context %}
+{% from 'helpers.html' import render_post, aside with context %}
 
 {% block head %}
 <title>Posts</title> 
@@ -7,7 +7,7 @@
 
 {% block body %}
 <main class="container">
-    <div class="row">
+    <div class="row mt-4">
         <div class="col-md-8">
             <h1>All Posts</h1>
 
@@ -17,6 +17,8 @@
                 No posts yet
             {% endfor%}
         </div>
+
+        {{ aside() }}
     </div>
 </main>
 
