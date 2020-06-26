@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}?u={{ last_updated }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/icons8-red-onedrive-480.png') }}" type="image/x-icon">
     {% block head%}
     {% endblock head%}
@@ -75,30 +75,11 @@
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.min.js' ) }}"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?u={{ last_updated }}"></script>
 
   <script lang="JavaScript">
 
-const post = (e) => {
-    e.preventDefault();
-    $.post("/user/{{current_user.id}}",
-    {csrf_token: $("#csrf_token").val(),
-    title: $("#title").val(),
-    content: $("#content").val()
-    }).done(function(response){
-        let new_post = `<div class="post">
-                            <h2>${response.title}</h2>
-                            <small>${response.ago}</small>
-                            <p>${response.content}</p>
-                            <a href="/posts/delete/${response.id}">Delete</a>
-                            <a href="/posts/edit/${response.id}">Edit</a>
-                            <hr>
-                        </div>`;
-        let last = $(".post:first");
-        $(last).before(new_post);
-        $(".reset").val("");
-    }).fail(function(){alert("Server Error")});    
-}
+
 $(function(){
 
 })

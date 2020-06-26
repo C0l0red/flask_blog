@@ -3,7 +3,7 @@ from app import db, login_manager
 from .forms import CommentForm, NewPostForm
 from flask_login import login_required, current_user
 from app.models import BlogPost, User, Comment, UserSchema, CommentSchema, BlogPostSchema
-from app.utils import ago as long_ago
+from app.utils import ago as long_ago, dir_last_updated
 from datetime import datetime
 
 post = Blueprint("post", __name__)
@@ -40,19 +40,19 @@ def home(id):
                 "content": new_post.content,
                 "id": new_post.id,
                 "ago": ago(new_post.date_posted)}
-    return render_template('home.html', form=form, user=user, posts=posts)
+    return render_template('home.html', form=form, user=user, posts=posts, last_updated=dir_last_updated('app/static'))
 
 @post.route("/")
 @post.route('/posts')
 def posts():
     all_posts = BlogPost.query.order_by(BlogPost.date_posted.desc()).all()
-    return render_template('posts.html', posts=all_posts)
+    return render_template('posts.html', posts=all_posts, last_updated=dir_last_updated('app/static'))
 
 @post.route("/posts/<public_id>")
 def single_post(public_id):
     post = BlogPost.query.filter_by(public_id=public_id).first_or_404()
 
-    return render_template("post.html", post=post)
+    return render_template("post.html", post=post, last_updated=dir_last_updated('app/static'))
 
 
 @post.route('/posts/edit/<int:id>', methods=['GET', 'POST'])
@@ -74,18 +74,18 @@ def edit(id):
         db.session.commit()
         return redirect(url_for("post.home", id=post.author.id))
     
-    return render_template('edit.html', post=post, form=form)
+    return render_template('edit.html', post=post, form=form, last_updated=dir_last_updated('app/static'))
 
 
-@post.route("/comment", methods=['GET', 'POST'])
+@post.route("/comment", methods=['POST'])
 @login_required
 def comment():
-    if "edit" in request.args:
+    if request.args.get("edit"):
         comment = Comment.query.filter_by(public_id = request.form["id"]).first_or_404()
         if comment.user != current_user:
             abort(403)
         comment.comment = request.form["comment"]
-        comment.edited = True
+        #comment.edited = True
         db.session.commit()
         return {"status":"success"}
     post = BlogPost.query.filter_by(public_id=request.form["id"]).first_or_404()

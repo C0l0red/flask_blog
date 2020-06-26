@@ -47,10 +47,11 @@
                         <div class="d-flex flex-row comment-row m-t-0 comment mb-2" id="{{ comment.public_id }}">
                             <div class="p-2"><img src="{{ url_for('static', filename='images/4.jpg') }}" alt="user" width="50" class="rounded-circle comment-user-image"></div>
                             <div class="comment-text w-100 pt-1 pb-1">
-                                <h6 class="font-medium comment-user">{{ comment.user }}</h6> <span class="m-b-15 d-block comment-body"> {{ comment.comment }} </span>
+                                <h6 class="font-medium comment-user">{{ comment.user }}</h6> 
+                                <span class="m-b-15 d-block comment-body"> {{ comment.comment }} </span>
                                 <div class="comment-footer"> <span class="text-muted float-right comment-time"> {{ comment.time_created|ago }} </span>
                                     {% if current_user == comment.user %}
-                                    <button type="button" class="btn btn-info btn-sm edit-comment" onclick="edit()">Edit</button>
+                                    <button type="button" class="btn btn-info btn-sm edit-comment" onclick="editComment()">Edit</button>
                                     <button type="button" class="btn btn-danger btn-sm delete-comment" onclick="del()">Delete</button> 
                                     {% elif current_user == post.author %}
                                     <button type="button" class="btn btn-danger btn-sm delete-comment" onclick="del()">Delete</button> 
@@ -72,7 +73,7 @@
             <div class="form-group">
                 <textarea name="comment" {{ disabled }} class="form-control" required></textarea>
             </div>
-            <div class="form-group">
+            <div class="form-group comment-submit">
                 <input type="submit" value="Comment" class="btn btn-info {{ disabled }}">
             </div>
         </form>

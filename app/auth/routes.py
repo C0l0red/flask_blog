@@ -3,6 +3,7 @@ from app import db, login_manager
 from .forms import RegistrationForm, LoginForm, ForgotPasswordForm, ResetPasswordForm, EditProfileForm
 from flask_login import login_required, login_user, logout_user, current_user
 from app.models import User, Login
+from app.utils import dir_last_updated
 
 auth = Blueprint("auth", __name__)
 
@@ -16,7 +17,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('post.posts'))
-    return render_template("register.html", form=form, title="Sign Up")
+    return render_template("register.html", form=form, title="Sign Up", last_updated=dir_last_updated('app/static'))
 
 @auth.route("/login", methods= ['GET', "POST"])
 def login():
@@ -40,7 +41,7 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for("post.posts"))
 
-    return render_template("login.html", form=form)
+    return render_template("login.html", form=form, last_updated=dir_last_updated('app/static'))
 
 @auth.route("/logout")
 def logout():
@@ -58,7 +59,7 @@ def forgot_password(done=False):
         user.send_mail(reset)
         return redirect(url_for("forgot_password", done=True))
 
-    return render_template("forgot-password.html", form=form, done=done)
+    return render_template("forgot-password.html", form=form, done=done, last_updated=dir_last_updated('app/static'))
 
 @auth.route("/reset-password/<token>", methods=["GET", "POST"])
 def reset_password(token):
@@ -76,7 +77,7 @@ def reset_password(token):
         print("ran")
         return redirect(url_for("post.posts"))
 
-    return render_template("reset-password.html", form=form)
+    return render_template("reset-password.html", form=form, last_updated=dir_last_updated('app/static'))
 
 @auth.route("/edit-profile", methods=['GET', 'POST'])
 @login_required
@@ -93,4 +94,4 @@ def edit_profile():
         db.session.commit()
         return redirect(url_for("post.home", id=current_user.id))
 
-    return render_template("edit-profile.html", form=form)
+    return render_template("edit-profile.html", form=form, last_updated=dir_last_updated('app/static'))

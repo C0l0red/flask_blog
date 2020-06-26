@@ -78,8 +78,7 @@ function react(reaction){
 
 const del = () => {
     let trigger = $(window.event.target);
-    let postId = $(window.event.target).closest('.post').attr('id');
-  
+
     if ($(trigger).hasClass('delete-comment')){
       var target = $(trigger).closest(".comment");
       var type = "comment";
@@ -101,9 +100,45 @@ const del = () => {
     });
   };
 
+const editComment = () => {
+  let trigger = $(window.event.target);
+  let commentDiv = $(trigger).closest('.comment')
+  let commentForm = $(commentDiv).closest('.post').find('.commentform')[0];
+  $(commentForm).find("[name='comment']").val($(commentDiv).find('.comment-body').text());
+  $(commentForm).find('.comment-submit').html(`
+  <button type='button' class='btn btn-info' id='save-edit'>Save</button>
+  <button class='btn btn-danger' type='button' id='cancel-edit'>Cancel</button>
+  `);
+  $(commentForm).find('#cancel-edit').on('click', (e) => {
+      console.log($(commentForm).find('.comment-submit').html());
+      //return;
+      $(commentForm).find('.comment-submit').html(`<input type='submit' class='btn btn-info' value='Comment'>`);
+      $(commentForm).find(`[name='comment']`).val('');
+  });
+  $(commentForm).find("#save-edit").on('click', (e) => {
+      console.log($(this));
+      //return;
+      $.post(`/comment?edit=True`,
+      {
+        'id': $(commentDiv).attr('id'),
+        'comment': $(commentForm).find(`[name='comment']`).val(),
+        'csrf_token': $(commentForm).find(`[name='csrf_token']`).val()
+      }
+      ).done(function(response){
+        console.log(response);
+        //return;
+        if (response.status == 'success'){
+          $(commentDiv).find('.comment-body').text($(commentForm).find(`[name='comment']`).val());
+          $(commentForm).find(`[name='comment']`).val('');
+          $(commentForm).find('.comment-submit').html(`<input type='submit' class='btn btn-info' value='Comment'>`);
+        }
+      }).fail(function(response){console.log("Server Error")});
+  });
+};
+
 
 $(function(){
-    console.log();
+    console.log("POLLY");
     react("Like");
     react("Dislike");
     comment(".commentform");
