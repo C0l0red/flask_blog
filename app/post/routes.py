@@ -1,10 +1,11 @@
-from flask import current_app as app, redirect, render_template, flash, url_for, Blueprint, abort, request
+from flask import current_app as app, redirect, render_template, flash, url_for, Blueprint, abort, request, flash
 from app import db, login_manager
-from .forms import CommentForm, NewPostForm
+from .forms import CommentForm, PostForm
 from flask_login import login_required, current_user
 from app.models import BlogPost, User, Comment, UserSchema, CommentSchema, BlogPostSchema
 from app.utils import ago as long_ago, dir_last_updated
 from datetime import datetime
+import bleach
 
 post = Blueprint("post", __name__)
 user_schema = UserSchema()
@@ -14,6 +15,9 @@ comments_schema = CommentSchema(many=True)
 blogpost_schema = BlogPostSchema()
 blogposts_schema = BlogPostSchema(many=True)
 
+TAGS = ['h2', 'h3', 'h4', 'h5', 'h6', 'del', 'sub', 'sup', 'cite', 'strike', 'hr', 'samp', 's', 'code', 'pre', 
+        'ins', 'img', 'canvas',
+         'dt', 'dd', 'table', 'caption','th', 'tr', 'td', 'cole', 'thead', 'tbody', 'tfoot', 'style', 'span','p']
 
 @post.context_processor
 def add_variables():
@@ -24,29 +28,28 @@ def add_variables():
 def ago(date):
     return long_ago(date)
 
-@post.route('/user/<int:id>', methods=["GET", "POST"])
-def home(id):
-    user = User.query.get_or_404(id)
-    posts = BlogPost.query.filter_by(author=user).order_by(BlogPost.date_posted.desc())
-    form = NewPostForm()
-    if form.validate_on_submit():
-        post = BlogPost.query.filter_by(title=form.title.data).first()
-        if post:
-            return redirect(url_for("post.home", id=user.id))
-        new_post = BlogPost(title=form.title.data, content=form.content.data, author=user)
-        db.session.add(new_post)
-        db.session.commit()
-        return {"title": new_post.title,
-                "content": new_post.content,
-                "id": new_post.id,
-                "ago": ago(new_post.date_posted)}
-    return render_template('home.html', form=form, user=user, posts=posts, last_updated=dir_last_updated('app/static'))
+@post.route('/user/<username>')
+@post.route('/user/<username>/<post_id>')
+def home(username, post_id=None):
+    user = User.query.filter_by(username=username).first_or_404()
+    #posts = BlogPost.query.filter_by(author=user).order_by(BlogPost.date_posted.desc())
+    posts = user.posts.filter_by(is_published=True).order_by(BlogPost.date_posted.desc()).all()
+    if current_user == user:
+        posts = user.posts.order_by(BlogPost.date_posted.desc()).all()
+    
+        if post_id:
+            posts = user.posts.filter_by(public_id=public_id).first_or_404()
+    return render_template('home.html', user=user, posts=posts, 
+                            last_updated=dir_last_updated('app/static'),
+                            home_active='active', home_sr=' <span class="sr-only">(current)</span>')
 
 @post.route("/")
 @post.route('/posts')
 def posts():
-    all_posts = BlogPost.query.order_by(BlogPost.date_posted.desc()).all()
-    return render_template('posts.html', posts=all_posts, last_updated=dir_last_updated('app/static'))
+    all_posts = BlogPost.query.filter_by(is_published=True).order_by(BlogPost.date_posted.desc()).all()
+    return render_template('posts.html', posts=all_posts, 
+                            last_updated=dir_last_updated('app/static'),
+                            posts_active ="active", posts_sr='<span class="sr-only">(current)</span>')
 
 @post.route("/posts/<public_id>")
 def single_post(public_id):
@@ -55,26 +58,66 @@ def single_post(public_id):
     return render_template("post.html", post=post, last_updated=dir_last_updated('app/static'))
 
 
-@post.route('/posts/edit/<int:id>', methods=['GET', 'POST'])
-@login_required
-def edit(id):
-    post = BlogPost.query.get_or_404(id)
-    form = CreateForm(obj=post)
 
-    if post.author != current_user:
-        abort(403)
-    #form.title.data = post.title
-    #form.content.data = post.conten#t
+@post.route("/editor", methods=["GET", "POST"])
+@post.route("/editor/<public_id>", methods=["GET", "POST"])
+@login_required
+def editor(public_id=None):
+    #cleaned_data = 
+    form = PostForm()
+    if public_id:
+        post = BlogPost.query.filter_by(public_id=public_id).first_or_404()
+        if post.author != current_user:
+            abort(403)
+        form = PostForm(obj=post)
+
+        if form.validate_on_submit():
+            form.content.data = bleach.clean(form.content.data, tags=bleach.sanitizer.ALLOWED_TAGS + TAGS)
+            form.populate_obj(post)
+            db.session.commit()
+            return redirect(url_for('post.preview', public_id=post.public_id))
+
 
     if form.validate_on_submit():
-        if form.content.data == post.content and form.title.data == post.title:
-            return redirect(url_for("posts"))
-        post.title = form.title.data
-        post.content = form.content.data
+ 
+        new_post = BlogPost(title=form.title.data, content=form.content.data, author=current_user)
+        db.session.add(new_post)
         db.session.commit()
-        return redirect(url_for("post.home", id=post.author.id))
+        return redirect(url_for('post.preview', public_id=new_post.public_id))
     
-    return render_template('edit.html', post=post, form=form, last_updated=dir_last_updated('app/static'))
+    if form.is_submitted():
+        print(form.errors)
+        for error in form.content.errors:
+            flash(error, "danger")
+        for error in form.title.errors:
+            flash(error, "danger")
+
+    return render_template("editor.html", form=form, 
+                            last_updated =dir_last_updated('app/static'),
+                            profile_active="active", profile_sr='<span class="sr-only">(current)</span>')
+
+
+@post.route("/preview/<public_id>", methods=["GET", "POST"])
+@login_required
+def preview(public_id):
+    post = BlogPost.query.filter_by(public_id=public_id).first_or_404()
+    if current_user != post.author:
+        abort(403)
+    
+    if request.method == "POST":
+        if request.form.get("publish"):
+            post.is_published = True
+            post.date_published = datetime.utcnow()
+        else:
+            post.published = False
+        db.session.commit()
+        print(post.is_published)
+        return redirect(url_for('post.home', username=current_user.username))
+
+    return render_template("preview.html", post=post, 
+                            last_updated=dir_last_updated('app/static'),
+                            profile_active='active', profile_sr='<span class="sr-only">(current)</span>')
+    
 
 
 @post.route("/comment", methods=['POST'])

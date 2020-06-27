@@ -2,25 +2,29 @@
     <div class="post" id="{{ post.public_id }}">
         <div class="post-header w-100 text-center">
             <h2 class="post-title text-capitalize">{{ post.title }}</h2>
+            {% if post.is_published %}
             {% if not index %}
                 <p>
                     <small class="text-muted">
-                        <span class="date-posted">{{ post.date_posted|ago }} by</span>
+                        <span class="date-posted">{{ post.date_published|ago }} by</span>
                         {% if current_user == post.author %}
-                        <a class="post-author" href="{{ url_for('post.home', id=post.author.id  ) }}">You</a>
+                        <a class="post-author" href="{{ url_for('post.home', username=post.author.username  ) }}">You</a>
                         {% else %}
-                        <a class="post-author" href="{{ url_for('post.home', id=post.author.id  ) }}">{{ post.author }}</a>
+                        <a class="post-author" href="{{ url_for('post.home', username=post.author.username  ) }}">{{ post.author }}</a>
                         {% endif %}
                     </small>
                 </p>
             {% else %}
-                <p><small class="text-muted"><span class="date-posted">{{ post.date_posted|ago }}</span></small></p>
+                <p><small class="text-muted"><span class="date-posted">{{ post.date_published|ago }}</span></small></p>
+            {% endif %}
+            {% else %}
+            <p><small class="text-danger">Draft</small></p>
             {% endif %}
         </div>
        {% set liked, disliked = post.in_(current_user) %}
-       {% set like_class = "btn-primary" if liked else "btn-secondary"%}
+       {% set like_class = "btn-info" if liked else "btn-secondary"%}
        {% set dislike_class = "btn-danger" if disliked else "btn-secondary" %}
-        <p class="post-content">{{ post.content }}</p>
+        <div class="post-content">{{ post.content|safe }}</div>
         <div class="d-flex justify-content-end">
             <div class="btn-group reactions mb-3" id='reactions-{{ post.public_id }}'>
                 <button type="button" class="btn btn-sm {{ like_class }} text-light Like" id="likes-{{ post.public_id }}">{{ post.likes.all()|length }} Like{{ post.likes.count()|pluralize }}</button>
@@ -79,16 +83,16 @@
         </form>
         {% if current_user == post.author %}
             <div class="d-block">
-                <button class="edit-post btn btn-sm btn-warning text-light" type="button" onclick="edit()">Edit</button>
+                <a class="edit-post btn btn-sm btn-info text-light" type="button" href="{{ url_for('post.editor', public_id= post.public_id) }}" >Edit</a>
                 <button class="delete-post btn btn-sm btn-danger text-light" type="button" onclick="del()">Delete</button>
             </div>
         {% endif %}
     </div>
 {% endmacro %}
 
-{% macro aside() %}
-<aside class="col-md-4 mt-4">
-    <div class="p-4 rounded bg-secondary">
+{% macro aside( classes=None) %}
+<aside class="col-md-4 mt-4 {{ classes }}">
+    <div class="p-4 rounded bg-secondary text-light">
       <h4 class="font-italic">About</h4>
       <p>A mini blogging service implemented with Flask.</p>
       <p>Still in the works tho.</p>
@@ -101,15 +105,6 @@
         <li><a href="#">February 2014</a></li>
         <li><a href="#">January 2014</a></li>
         <li><a href="#">December 2013</a></li>
-        <li><a href="#">November 2013</a></li>
-        <li><a href="#">October 2013</a></li>
-        <li><a href="#">September 2013</a></li>
-        <li><a href="#">August 2013</a></li>
-        <li><a href="#">July 2013</a></li>
-        <li><a href="#">June 2013</a></li>
-        <li><a href="#">May 2013</a></li>
-        <li><a href="#">April 2013</a></li>
-      </ol>
     </div>
 
     <div class="p-4">
@@ -121,4 +116,24 @@
       </ol>
     </div>
 </aside>
+{% endmacro %}
+
+{% macro delete_modal() %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirm Delete</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endmacro %}

@@ -95,6 +95,6 @@ def edit_profile():
         current_user.email = form.email.data
         current_user.username = form.username.data
         db.session.commit()
-        return redirect(url_for("post.home", id=current_user.id))
+        return redirect(url_for("post.home", username=current_user.username))
 
     return render_template("edit-profile.html", form=form, last_updated=dir_last_updated('app/static'))

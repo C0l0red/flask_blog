@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% from 'helpers.html' import render_post, aside with context %}
 
+
 {% block head %}
 <title>Posts</title> 
 {% endblock %}
@@ -21,6 +22,11 @@
         {{ aside() }}
     </div>
 </main>
+
+{% if current_user.is_authenticated %}
+  {% from 'helpers.html' import delete_modal %}
+  {{ delete_modal() }}
+{% endif %}
 
 
 {% endblock %}

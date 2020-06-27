@@ -63,9 +63,9 @@ function react(reaction){
             $(Post).find(".Like").text(response.likes);
             $(Post).find(".Dislike").text(response.dislikes);
             if (response.liked)
-              $(Post).find(".Like").removeClass("btn-secondary").addClass("btn-success");
+              $(Post).find(".Like").removeClass("btn-secondary").addClass("btn-info");
             else
-              $(Post).find(".Like").removeClass("btn-success").addClass("btn-secondary");
+              $(Post).find(".Like").removeClass("btn-info").addClass("btn-secondary");
             if (response.disliked)
               $(Post).find(".Dislike").removeClass("btn-secondary").addClass("btn-danger");
             else

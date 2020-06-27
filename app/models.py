@@ -66,7 +66,7 @@ class UserSchema(ma.Schema):
         fields = ("public_id", "username", "email")
 
     _links = ma.Hyperlinks(
-        {"self": ma.URLFor("post.home", public_id="<public_id>")}
+        {"self": ma.URLFor("post.home", username="<username>")}
     )
 
 class BlogPost(db.Model, ModelMixin):
@@ -75,10 +75,12 @@ class BlogPost(db.Model, ModelMixin):
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date_published = db.Column(db.DateTime)
     edited = db.Column(db.Boolean, default=False)
+    is_published = db.Column(db.Boolean, default=False)
 
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    author = db.relationship("User", backref='posts', lazy=True)
+    author = db.relationship("User", backref=db.backref('posts',lazy='dynamic'), lazy=True)
     likes = db.relationship("User", backref='liked_posts', secondary="likes", collection_class=set, lazy="dynamic")
     dislikes = db.relationship("User", backref='disliked_posts', secondary="dislikes", collection_class=set, lazy="dynamic")
     

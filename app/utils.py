@@ -2,6 +2,7 @@ from datetime import datetime
 import jwt
 import os
 
+
 def  dir_last_updated(folder):
         return str(max(os.path.getmtime(os.path.join(root_path, f))
                         for root_path, dirs, files in os.walk(folder)
@@ -27,4 +28,7 @@ def ago(dt, now=datetime.utcnow):
         elif diff.days >= 365:
                 return dt.strftime("%B %d, %Y") 
         return f"{difference} {unit if difference == 1 else unit+'s'} ago"
+
+def cleaner(data):
+        pass
 

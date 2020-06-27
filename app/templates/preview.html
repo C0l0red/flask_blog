@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% from 'helpers.html' import aside, delete_modal %}
+{% set checked = "checked" if post.is_published else "" %}
+
+{% block head %}
+<title>Preview</title>
+{% endblock head %}
+
+{% block body %}
+<main class="container">
+    <div class="row mt-4 h-100" style="height: max-content;">
+        <div class="col-xs-12 col-md-8 h-100 order-1 order-md-1">
+            <div class="post" id="{{ post.public_id }}">
+                <div class="post-header w-100 text-center">
+                    <h1 class="post-title text-capitalize">{{ post.title }}</h1>
+                    {% if post.is_published %}
+                    <p><small class="text-muted">
+                        <span class="date-posted">{{ post.date_published|ago }}</span>
+                        <a href="{{ post.author }}" class="post-author"></a>
+                    </small></p>
+                    {% endif %}
+                </div>
+
+                <div class="post-content">
+                    {{ post.content|safe }}
+                </div>
+            </div>
+
+
+        </div>
+
+        {{ aside("order-3 order-md-2") }}
+        <div class="col-xs-12 sticky-bottom w-100 order-2 order-md-3 pl-4 pl-md-2 pr-4 mb-md-3">
+            <button type="button" class="delete-post btn btn-danger" onclick="del()">Delete</button>
+            <a type="button" class="edit-post btn btn-info" href="{{ url_for('post.editor', public_id= post.public_id) }}" >Edit</a>
+
+            <form action="#" method="POST" class="d-inline offset-4 offset-md-4">
+                <label>
+                    <input type="checkbox" name="publish" id="publish" value="publish" {{checked}}> Publish
+                </label>
+                <input type="submit" value="Save" class="btn btn-info">
+            </form>
+        </div>
+    </div>
+</main>
+
+{{ delete_modal() }}
+{% endblock body %}

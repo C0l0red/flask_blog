@@ -1,30 +1,23 @@
 {% extends 'base.html' %}
+{% from 'helpers.html' import aside %}
 
 {% block head %}
     <title>Edit Profile</title>
 {% endblock head %}
 
-{% macro render_field(field) %}
-    {{ field.label }}
-    <br>
-    {{ field }}
-    <br>
-    {% for error in field.errors %}
-        <small>{{ error }}</small>
-        <br>
-    {% endfor %}
-{% endmacro %}
-
 {% block body %}
-    <form action="#" method="post">
-        {{ form.csrf_token }}
-        {{ render_field(form.username) }}
-        <fieldset>
-            <legend>These can only be changed by providing your current password</legend>
-            {{ render_field(form.current_password) }}
-            {{ render_field(form.email) }}
-            {{ render_field(form.new_password) }}
-        </fieldset>
-        <input type="submit" value="Edit">
-    </form>
+<main class="container">
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <form action="#" method="POST">
+                {{ form.csrf_token }}
+                
+
+            </form>
+        </div>
+
+        {{ aside() }}
+    </div>
+</main>
+    
 {% endblock body %}
