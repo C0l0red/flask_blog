@@ -37,16 +37,19 @@ def ago(date):
 @post.route('/user/<username>/<post_id>')
 def home(username, post_id=None):
     user = User.query.filter_by(username=username).first_or_404()
-    #posts = BlogPost.query.filter_by(author=user).order_by(BlogPost.date_posted.desc())
+    disabled = ""
     posts = user.posts.filter_by(is_published=True).order_by(BlogPost.date_posted.desc()).all()
     if current_user == user:
         posts = user.posts.order_by(BlogPost.date_posted.desc()).all()
     
-        if post_id:
-            posts = user.posts.filter_by(public_id=public_id).first_or_404()
-    return render_template('home.html', user=user, posts=posts, 
+    if post_id:
+        posts = user.posts.filter_by(public_id=post_id, is_published=True).all()
+        disabled = "disabled"
+    
+    return render_template('home.html', user=user, posts=posts,
                             last_updated=dir_last_updated('app/static'),
-                            home_active='active', home_sr=' <span class="sr-only">(current)</span>')
+                            home_active='active', home_sr=' <span class="sr-only">(current)</span>',
+                            disabled=disabled)
 
 @post.route("/")
 @post.route('/posts')
@@ -77,7 +80,8 @@ def editor(public_id=None):
         form = PostForm(obj=post)
 
         if form.validate_on_submit():
-            form.content.data = bleach.clean(form.content.data, tags=bleach.sanitizer.ALLOWED_TAGS + TAGS, attributes=ATTRS, styles=STYLES)
+            form.content.data = bleach.clean(form.content.data, tags=bleach.sanitizer.ALLOWED_TAGS + TAGS, 
+                                            attributes={**bleach.sanitizer.ALLOWED_ATTRIBUTES, **ATTRS}, styles= bleach.sanitizer.ALLOWED_STYLES + STYLES)
             form.populate_obj(post)
             db.session.commit()
             return redirect(url_for('post.preview', public_id=post.public_id))

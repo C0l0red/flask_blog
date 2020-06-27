@@ -6,7 +6,15 @@
   {% from 'helpers.html' import delete_modal %}
 
 {% block head %}
-<title>{{ user }}'s Page</title> 
+<title>{{ user }}'s Page</title>
+<style>
+  a.disabled {
+  /* Make the disabled links grayish*/
+  color: initial;
+  /* And disable the pointer events */
+  pointer-events: none;
+}
+</style>
 {% endblock %}
 
 {% block body %}
@@ -14,9 +22,10 @@
     <div class="row">
       <div class="posts col-md-8">
         <div class="row">
-          <h1 class="text-capitalize d-inline">{{ user }}'s posts</h1>
+          <h2 class="text-capitalize d-inline">{{ user }}'s posts</h2>
           
         </div>
+
         {% for post in posts %}
             <div class="post">
                 {{ render_post(post=post, index=True) }}
@@ -24,6 +33,7 @@
         {% else %}
             No posts yet
         {% endfor %}
+       
       </div>
       
       {{ aside() }}
