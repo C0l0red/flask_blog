@@ -1,5 +1,5 @@
 {% macro render_post(post, index= False) %}
-    <div class="post" id="{{ post.public_id }}">
+    <div class="post pt-2 pb-2" id="{{ post.public_id }}">
         <div class="post-header w-100 text-center">
             <h2 class="post-title text-capitalize">{{ post.title }}</h2>
             {% if post.is_published %}

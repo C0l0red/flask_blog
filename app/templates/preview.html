@@ -34,7 +34,7 @@
             <button type="button" class="delete-post btn btn-danger" onclick="del()">Delete</button>
             <a type="button" class="edit-post btn btn-info" href="{{ url_for('post.editor', public_id= post.public_id) }}" >Edit</a>
 
-            <form action="#" method="POST" class="d-inline offset-4 offset-md-4">
+            <form action="#" method="POST" class="d-inline offset-2 offset-md-4">
                 <label>
                     <input type="checkbox" name="publish" id="publish" value="publish" {{checked}}> Publish
                 </label>

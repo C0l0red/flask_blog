@@ -16,7 +16,7 @@ blogpost_schema = BlogPostSchema()
 blogposts_schema = BlogPostSchema(many=True)
 
 TAGS = ['h2', 'h3', 'h4', 'h5', 'h6', 'del', 'sub', 'sup', 'cite', 'strike', 'hr', 'samp', 's', 'code', 'pre', 
-        'ins', 'img', 'canvas',
+        'ins', 'img', 'canvas','u','br', 'font',
          'dt', 'dd', 'table', 'caption','th', 'tr', 'td', 'cole', 'thead', 'tbody', 'tfoot', 'style', 'span','p']
 
 @post.context_processor
