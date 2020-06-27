@@ -20,7 +20,7 @@ TAGS = ['h2', 'h3', 'h4', 'h5', 'h6', 'del', 'sub', 'sup', 'cite', 'strike', 'hr
          'dt', 'dd', 'table', 'caption','th', 'tr', 'td', 'cole', 'thead', 'tbody', 'tfoot', 'style', 'span','p']
 
 ATTRS = {
-    "*": ['class', 'style', 'color']
+    "*": ['class', 'style', 'color', 'target']
 }
 STYLES = ["color", 'text-align', 'font-weight', 'margin-left', 'font-family']
 
