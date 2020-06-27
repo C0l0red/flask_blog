@@ -19,6 +19,11 @@ TAGS = ['h2', 'h3', 'h4', 'h5', 'h6', 'del', 'sub', 'sup', 'cite', 'strike', 'hr
         'ins', 'img', 'canvas','u','br', 'font',
          'dt', 'dd', 'table', 'caption','th', 'tr', 'td', 'cole', 'thead', 'tbody', 'tfoot', 'style', 'span','p']
 
+ATTRS = {
+    "*": ['class', 'style', 'color']
+}
+STYLES = ["color", 'text-align', 'font-weight', 'margin-left', 'font-family']
+
 @post.context_processor
 def add_variables():
     return dict(comment_form=CommentForm,
@@ -72,7 +77,7 @@ def editor(public_id=None):
         form = PostForm(obj=post)
 
         if form.validate_on_submit():
-            form.content.data = bleach.clean(form.content.data, tags=bleach.sanitizer.ALLOWED_TAGS + TAGS)
+            form.content.data = bleach.clean(form.content.data, tags=bleach.sanitizer.ALLOWED_TAGS + TAGS, attributes=ATTRS, styles=STYLES)
             form.populate_obj(post)
             db.session.commit()
             return redirect(url_for('post.preview', public_id=post.public_id))
@@ -106,8 +111,9 @@ def preview(public_id):
     
     if request.method == "POST":
         if request.form.get("publish"):
-            post.is_published = True
-            post.date_published = datetime.utcnow()
+            if not post.is_published:
+                post.is_published = True
+                post.date_published = datetime.utcnow()
         else:
             post.published = False
         db.session.commit()
