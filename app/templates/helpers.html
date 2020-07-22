@@ -31,8 +31,8 @@
         <div class="post-content">{{ post.content|safe }}</div>
         <div class="d-flex justify-content-end">
             <div class="btn-group reactions mb-3" id='reactions-{{ post.public_id }}'>
-                <button type="button" class="btn btn-sm {{ like_class }} text-light Like" id="likes-{{ post.public_id }}">{{ post.likes.all()|length }} Like{{ post.likes.count()|pluralize }}</button>
-                <button type="button" class="btn btn-sm {{ dislike_class }} text-light Dislike" id="dislikes-{{ post.public_id }}">{{ post.dislikes.all()|length }} Dislike{{ post.dislikes.count()|pluralize }}</button>
+                <button style="border-radius: 20px 0 0 20px;" type="button" class="btn btn-sm {{ like_class }} text-light Like" id="likes-{{ post.public_id }}">{{ post.likes.all()|length }} Like{{ post.likes.count()|pluralize }}</button>
+                <button style="border-radius: 0 20px 20px 0;" type="button" class="btn btn-sm {{ dislike_class }} text-light Dislike" id="dislikes-{{ post.public_id }}">{{ post.dislikes.all()|length }} Dislike{{ post.dislikes.count()|pluralize }}</button>
             </div>
         </div>
         
